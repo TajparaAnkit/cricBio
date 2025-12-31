@@ -1,5 +1,5 @@
 {
-  "name": "gully-cricket-score-board",
+  "name": "cricBio",
   "version": "0.1.0",
   "private": true,
   "homepage": "https://AnkitTajpara.github.io/cricBio",
@@ -20,13 +20,11 @@
     "yup": "^0.32.11"
   },
   "scripts": {
-    "dev": "cd src && vite",
-    "start": "cd src && vite",
-    "build": "tsc --noEmit && vite build",
+    "dev": "vite",
+    "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
     "@types/react": "^17.0.56",

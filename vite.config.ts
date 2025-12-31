@@ -12,5 +12,6 @@ export default defineConfig(async () => {
         'main': path.resolve(__dirname, 'src/main'),
       },
     },
+    base: './crickapp/',
   }
 })
