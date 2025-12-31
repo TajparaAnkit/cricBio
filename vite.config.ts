@@ -1,17 +1,11 @@
 import { defineConfig } from 'vite'
-import path from 'path'
+import react from '@vitejs/plugin-react'
 
 // dynamically import ESM-only plugins to avoid 'require' loading issues
 export default defineConfig(async () => {
   const reactPlugin = (await import('@vitejs/plugin-react')).default
   return {
     plugins: [reactPlugin()],
-    resolve: {
-      alias: {
-        'components': path.resolve(__dirname, 'src/components'),
-        'main': path.resolve(__dirname, 'src/main'),
-      },
-    },
-    base: './crickapp/',
+    base: '/cricBio/',   // 👈 EXACT repo name (case-sensitive)
   }
 })
