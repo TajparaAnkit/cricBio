@@ -2,6 +2,7 @@
   "name": "gully-cricket-score-board",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://AnkitTajpara.github.io/cricBio",
   "dependencies": {
     "@emotion/react": "^11.7.0",
     "@emotion/styled": "^11.6.0",
@@ -23,7 +24,9 @@
     "start": "cd src && vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext .ts,.tsx,.js,.jsx"
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "devDependencies": {
     "@types/react": "^17.0.56",
@@ -34,6 +37,7 @@
     "@vitejs/plugin-react": "^5.1.1",
     "eslint": "^8.44.0",
     "eslint-plugin-react": "^7.32.2",
+    "gh-pages": "^6.3.0",
     "typescript": "~5.9.3",
     "vite": "^5.1.3"
   },
