@@ -1,4 +1,4 @@
-# Gully Cricket Score Board 🏏
+# cricBio Cricket Score Board 🏏
 
 A lightweight cricket scoreboard web app to manage team and player scores (runs, balls, strike rate) and bowler statistics (overs, maidens, runs, wickets, economy).
 
