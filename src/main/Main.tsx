@@ -2,17 +2,17 @@ import NotFound from "../components/NotFound";
 import ScoreBoard from "../components/ScoreBoard";
 import StepperContainer from "../components/StepperContainer";
 import React from "react";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { HashRouter, Route, Switch } from "react-router-dom";
 
 const Main: React.FC = () => {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Switch>
         <Route exact path="/" component={StepperContainer} />
         <Route exact path="/score" component={ScoreBoard} />
         <Route path="*" component={NotFound} />
       </Switch>
-    </BrowserRouter>
+    </HashRouter>
   );
 };
 
