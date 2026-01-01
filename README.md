@@ -8,7 +8,7 @@ A lightweight cricket scoreboard web app to manage team and player scores (runs,
 
 ## Demo & Screenshots
 
-- Live demo: https://tajparaankit.github.io/cricBio/  ✅
+- Live demo: https://tajparaankit.github.io/cricBio/#/  ✅
 - Screenshots are available in `public/images/` (select teams, overs, wicket modal, scoreboard, etc.)
 
 ---
