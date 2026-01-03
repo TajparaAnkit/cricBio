@@ -13,7 +13,7 @@ import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import Autosuggest from 'react-autosuggest'
 import { BATTING, OUT } from '../constants/BattingStatus'
-import { BOLD, CATCH, HIT_WICKET, RUN_OUT, STUMP } from '../constants/OutType'
+import { BOLD, RUN_OUT } from '../constants/OutType'
 import MathUtil from '../util/MathUtil'
 import './ScoreBoard.css'
 import { radioGroupBoxstyle } from './ui/RadioGroupBoxStyle'
@@ -30,7 +30,6 @@ const ScoreBoard = () => {
   const [batters, setBatters] = useState([])
   const [ballCount, setBallCount] = useState(0)
   const [overCount, setOverCount] = useState(0)
-  const [recentOvers, setRecentOvers] = useState([])
   const [batter1, setBatter1] = useState({})
   const [batter2, setBatter2] = useState({})
   const [battingOrder, setBattingOrder] = useState(0)
@@ -188,7 +187,6 @@ const ScoreBoard = () => {
         setTotalOvers(0)
         setBallCount(0)
         setOverCount(0)
-        setRecentOvers([])
         setBatter1({})
         setBatter2({})
         setBatters([])
@@ -344,10 +342,6 @@ const ScoreBoard = () => {
       bowlerNameElement.disabled = false
     }
     disableAllScoreButtons()
-    setRecentOvers((state) => [
-      ...state,
-      { overNo: overCount + 1, bowler: bowler.name, runs: runsByOverParam, stack: currentRunStackParam },
-    ])
     setInputBowler('')
     setBowler({})
     setCurrentRunStack([])
@@ -1094,45 +1088,6 @@ const ScoreBoard = () => {
                     className='form-radio-row'
                   >
                     <FormControlLabel
-                      value={CATCH}
-                      control={
-                        <Radio
-                          sx={{
-                            '&.Mui-checked': {
-                              color: pink[600],
-                            },
-                          }}
-                        />
-                      }
-                      label={CATCH}
-                    />
-                    <FormControlLabel
-                      value={STUMP}
-                      control={
-                        <Radio
-                          sx={{
-                            '&.Mui-checked': {
-                              color: pink[600],
-                            },
-                          }}
-                        />
-                      }
-                      label={STUMP}
-                    />
-                    <FormControlLabel
-                      value={HIT_WICKET}
-                      control={
-                        <Radio
-                          sx={{
-                            '&.Mui-checked': {
-                              color: pink[600],
-                            },
-                          }}
-                        />
-                      }
-                      label={HIT_WICKET}
-                    />
-                    <FormControlLabel
                       value={BOLD}
                       control={
                         <Radio
@@ -1197,9 +1152,7 @@ const ScoreBoard = () => {
               <tr>
                 <td className='score-types padding-left'>Batter</td>
                 <td className='score-types'>R(B)</td>
-                <td className='score-types text-center'>4s</td>
-                <td className='score-types text-center'>6s</td>
-                <td className='score-types text-center'>SR</td>
+              
               </tr>
             </thead>
             <tbody>
@@ -1222,9 +1175,7 @@ const ScoreBoard = () => {
                   </IconButton>
                 </td>
                 <td className='score-types'>{batter1.run === undefined ? `0(0)` : `${batter1.run}(${batter1.ball})`}</td>
-                <td className='score-types'>{batter1.four === undefined ? 0 : batter1.four}</td>
-                <td className='score-types'>{batter1.six === undefined ? 0 : batter1.six}</td>
-                <td className='score-types'>{batter1.strikeRate === undefined ? 0 : batter1.strikeRate}</td>
+                
               </tr>
               <tr>
                 <td className='score-types'>
@@ -1245,9 +1196,7 @@ const ScoreBoard = () => {
                   </IconButton>
                 </td>
                 <td className='score-types'>{batter2.run === undefined ? `0(0)` : `${batter2.run}(${batter2.ball})`}</td>
-                <td className='score-types'>{batter2.four === undefined ? 0 : batter2.four}</td>
-                <td className='score-types'>{batter2.six === undefined ? 0 : batter2.six}</td>
-                <td className='score-types'>{batter2.strikeRate === undefined ? 0 : batter2.strikeRate}</td>
+              
               </tr>
             </tbody>
           </table>
@@ -1338,194 +1287,8 @@ const ScoreBoard = () => {
           <div>Wd: {extras.wide}</div>
           <div>NB: {extras.noBall}</div>
         </div>
-        <div className='recent-over-container'>
-          <div className='recent-over-text'>Recent Overs</div>
-          <div className='recent-over-details'>
-            <table>
-              <tbody>
-                {recentOvers.map((recentOver, i) => (
-                  <tr key={i}>
-                    <td>{recentOver.overNo}.</td>
-                    <td>{recentOver.bowler}:</td>
-                    <td>
-                      <div className='recent-over-runs'>
-                        {recentOver.stack.map((run, index) => (
-                          <div key={index}>{run}</div>
-                        ))}
-                      </div>
-                    </td>
-                    <td className='recent-over-total-run'>
-                      <div>{recentOver.runs}</div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div className='score-board-container'>
-          <div className='score-board-text text-center'>Score Board</div>
-          {/* Inning1 Starts here */}
-          <div>
-            <div className='score-board-innings'>
-              <div>{scoringTeam} Innings</div>
-              <div>RR:{inningNo === 1 ? crr : inning1.runRate}</div>
-              <div>
-                {inningNo === 1 ? totalRuns : inning1.runs}-{inningNo === 1 ? wicketCount : inning1.wickets} (
-                {inningNo === 1 ? totalOvers : inning1.overs} Ov)
-              </div>
-            </div>
-            <div className='sb-batting'>
-              <table>
-                <thead>
-                  <tr>
-                    <td className='score-types padding-left'>Batter</td>
-                    <td className='score-types'>R(B)</td>
-                    <td className='score-types text-center'>4s</td>
-                    <td className='score-types text-center'>6s</td>
-                    <td className='score-types text-center'>SR</td>
-                  </tr>
-                </thead>
-                <tbody>
-                  {inning1.batters.map((batter, i) => {
-                    return (
-                      <tr key={i}>
-                        <td className='score-types padding-left'>{batter.name}</td>
-                        <td className='score-types'>
-                          {batter.run}({batter.ball})
-                        </td>
-                        <td className='score-types text-center'>{batter.four}</td>
-                        <td className='score-types text-center'>{batter.six}</td>
-                        <td className='score-types text-center'>{batter.strikeRate}</td>
-                      </tr>
-                    )
-                  })}
-                  <tr>
-                    <td className='score-types padding-left'>Extras:</td>
-                    <td className='score-types'>{inningNo === 1 ? extras.total : inning1.extra.total}</td>
-                    <td className='score-types text-center'>wd:{inningNo === 1 ? extras.wide : inning1.extra.wide}</td>
-                    <td className='score-types text-center'>nb:{inningNo === 1 ? extras.noBall : inning1.extra.noBall}</td>
-                    <td className='score-types text-center'></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div className='sb-bowling'>
-              <table>
-                <thead>
-                  <tr>
-                    <td className='score-types padding-left'>Bowler</td>
-                    <td className='score-types'>O</td>
-                    <td className='score-types text-center'>M</td>
-                    <td className='score-types text-center'>R</td>
-                    <td className='score-types text-center'>W</td>
-                    <td className='score-types text-center'>NB</td>
-                    <td className='score-types text-center'>WD</td>
-                    <td className='score-types text-center'>ECO</td>
-                  </tr>
-                </thead>
-                <tbody>
-                  {inning1.bowlers.map((blr, i) => {
-                    const { name, over, maiden, run, wicket, noBall, wide, economy } = blr
-                    return (
-                      <tr key={i}>
-                        <td className='score-types padding-left'>{name}</td>
-                        <td className='score-types'>{over}</td>
-                        <td className='score-types text-center'>{maiden}</td>
-                        <td className='score-types text-center'>{run}</td>
-                        <td className='score-types text-center'>{wicket}</td>
-                        <td className='score-types text-center'>{noBall}</td>
-                        <td className='score-types text-center'>{wide}</td>
-                        <td className='score-types text-center'>{economy}</td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          {/* Inning2 Starts here */}
-          {inningNo === 2 && (
-            <div>
-              <div className='score-board-innings'>
-                <div>{chessingTeam} Innings</div>
-                <div>RR:{inningNo === 2 ? crr : inning2.runRate}</div>
-                <div>
-                  {hasMatchEnded ? inning2.runs : totalRuns}-{hasMatchEnded ? inning2.wickets : wicketCount} (
-                  {hasMatchEnded ? inning2.overs : totalOvers} Ov)
-                </div>
-              </div>
-              <div className='sb-batting'>
-                <table>
-                  <thead>
-                    <tr>
-                      <td className='score-types padding-left'>Batter</td>
-                      <td className='score-types'>R(B)</td>
-                      <td className='score-types text-center'>4s</td>
-                      <td className='score-types text-center'>6s</td>
-                      <td className='score-types text-center'>SR</td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {inning2.batters.map((batter, i) => {
-                      return (
-                        <tr key={i}>
-                          <td className='score-types padding-left'>{batter.name}</td>
-                          <td className='score-types'>
-                            {batter.run}({batter.ball})
-                          </td>
-                          <td className='score-types text-center'>{batter.four}</td>
-                          <td className='score-types text-center'>{batter.six}</td>
-                          <td className='score-types text-center'>{batter.strikeRate}</td>
-                        </tr>
-                      )
-                    })}
-                    <tr>
-                      <td className='score-types padding-left'>Extras:</td>
-                      <td className='score-types'>{hasMatchEnded ? inning2.extra.total : extras.total}</td>
-                      <td className='score-types text-center'>wd:{hasMatchEnded ? inning2.extra.wide : extras.wide}</td>
-                      <td className='score-types text-center'>nb:{hasMatchEnded ? inning2.extra.noBall : extras.noBall}</td>
-                      <td className='score-types text-center'></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div className='sb-bowling'>
-                <table>
-                  <thead>
-                    <tr>
-                      <td className='score-types padding-left'>Bowler</td>
-                      <td className='score-types'>O</td>
-                      <td className='score-types text-center'>M</td>
-                      <td className='score-types text-center'>R</td>
-                      <td className='score-types text-center'>W</td>
-                      <td className='score-types text-center'>NB</td>
-                      <td className='score-types text-center'>WD</td>
-                      <td className='score-types text-center'>ECO</td>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {inning2.bowlers.map((blr, i) => {
-                      const { name, over, maiden, run, wicket, noBall, wide, economy } = blr
-                      return (
-                        <tr key={i}>
-                          <td className='score-types padding-left'>{name}</td>
-                          <td className='score-types'>{over}</td>
-                          <td className='score-types text-center'>{maiden}</td>
-                          <td className='score-types text-center'>{run}</td>
-                          <td className='score-types text-center'>{wicket}</td>
-                          <td className='score-types text-center'>{noBall}</td>
-                          <td className='score-types text-center'>{wide}</td>
-                          <td className='score-types text-center'>{economy}</td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-        </div>
+        
+        
       </div>
     </div>
   )
