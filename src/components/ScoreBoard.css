@@ -243,9 +243,6 @@ table thead {
 .text-center {
   text-align: center;
 }
-.score-board-container {
-  margin: 0.8rem 0;
-}
 .score-board-innings {
   display: flex;
   justify-content: space-between;
