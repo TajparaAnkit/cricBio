@@ -2,21 +2,13 @@
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import { IconButton } from '@mui/material'
-import Box from '@mui/material/Box'
-import { pink } from '@mui/material/colors'
-import FormControl from '@mui/material/FormControl'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Modal from '@mui/material/Modal'
-import Radio from '@mui/material/Radio'
-import RadioGroup from '@mui/material/RadioGroup'
 import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import Autosuggest from 'react-autosuggest'
 import { BATTING, OUT } from '../constants/BattingStatus'
-import { BOLD, RUN_OUT } from '../constants/OutType'
 import MathUtil from '../util/MathUtil'
-import './ScoreBoard.css'
-import { radioGroupBoxstyle } from './ui/RadioGroupBoxStyle'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDeleteLeft, faPencil, faStar, faTrash } from '@fortawesome/free-solid-svg-icons'
 
 const ScoreBoard = () => {
   const [inningNo, setInningNo] = useState(1)
@@ -39,7 +31,6 @@ const ScoreBoard = () => {
   const [bowler, setBowler] = useState({})
   const [bowlers, setBowlers] = useState([])
   const [inputBowler, setInputBowler] = useState('')
-  const [isModalOpen, setModalOpen] = React.useState(false)
   const [outType, setOutType] = React.useState('')
   const [runOutPlayerId, setRunOutPlayerId] = React.useState('')
   const [remainingBalls, setRemainingBalls] = useState(0)
@@ -161,8 +152,8 @@ const ScoreBoard = () => {
       }
       if (inningNo === 1) {
         setMatch((state) => {
-          const totalFours = batters.map((batter) => batter.four).reduce((prev, next) => prev + next)
-          const totalSixes = batters.map((batter) => batter.four).reduce((prev, next) => prev + next)
+          const totalFours = batters.map((batter) => batter.four).reduce((prev, next) => prev + next, 0)
+          const totalSixes = batters.map((batter) => batter.four).reduce((prev, next) => prev + next, 0)
           return {
             ...state,
             inning1: {
@@ -198,18 +189,12 @@ const ScoreBoard = () => {
         setRemainingRuns(totalRuns + 1)
         const bowlerNameElement = document.querySelector('.react-autosuggest__input')
         bowlerNameElement.disabled = false
-        const batter1NameElement = document.getElementById('batter1Name')
-        batter1NameElement.value = ''
-        batter1NameElement.disabled = false
-        const batter2NameElement = document.getElementById('batter2Name')
-        batter2NameElement.value = ''
-        batter2NameElement.disabled = false
         setStrikeValue('strike')
         endInningButton.disabled = true
       } else {
         setMatch((state) => {
-          const totalFours = batters.map((batter) => batter.four).reduce((prev, next) => prev + next)
-          const totalSixes = batters.map((batter) => batter.four).reduce((prev, next) => prev + next)
+          const totalFours = batters.map((batter) => batter.four).reduce((prev, next) => prev + next, 0)
+          const totalSixes = batters.map((batter) => batter.four).reduce((prev, next) => prev + next, 0)
           return {
             ...state,
             inning2: {
@@ -228,62 +213,6 @@ const ScoreBoard = () => {
         endInningButton.textContent = 'Reset'
         setMatchEnded(true)
       }
-    }
-  }
-  const handleBatter1Blur = (e) => {
-    let name = e.target.value
-    name = name.charAt(0).toUpperCase() + name.slice(1)
-    e.target.value = name
-    e.target.disabled = true
-    if (isBatter1Edited) {
-      setBatter1((state) => ({
-        ...state,
-        name: name,
-      }))
-      setBatter1Edited(false)
-    } else {
-      const randomNo = MathUtil.getRandomNo()
-      setBatter1({
-        id: name + randomNo,
-        name: name,
-        run: 0,
-        ball: 0,
-        four: 0,
-        six: 0,
-        strikeRate: 0,
-        onStrike: strikeValue === 'strike' ? true : false,
-        battingOrder: battingOrder + 1,
-        battingStatus: BATTING,
-      })
-      setBattingOrder(battingOrder + 1)
-    }
-  }
-  const handleBatter2Blur = (e) => {
-    let name = e.target.value
-    name = name.charAt(0).toUpperCase() + name.slice(1)
-    e.target.value = name
-    e.target.disabled = true
-    if (isBatter2Edited) {
-      setBatter2((state) => ({
-        ...state,
-        name: name,
-      }))
-      setBatter2Edited(false)
-    } else {
-      const randomNo = MathUtil.getRandomNo()
-      setBatter2({
-        id: name + randomNo,
-        name: name,
-        run: 0,
-        ball: 0,
-        four: 0,
-        six: 0,
-        strikeRate: 0,
-        onStrike: strikeValue === 'non-strike' ? true : false,
-        battingOrder: battingOrder + 1,
-        battingStatus: BATTING,
-      })
-      setBattingOrder(battingOrder + 1)
     }
   }
   const handleBowlerBlur = (e) => {
@@ -399,9 +328,6 @@ const ScoreBoard = () => {
     }
   }
   const newBatter1 = () => {
-    const batter1NameElement = document.getElementById('batter1Name')
-    batter1NameElement.value = ''
-    batter1NameElement.disabled = false
     const { id, name, run, ball, four, six, strikeRate, onStrike } = batter1
     setBatters((state) => [
       ...state,
@@ -421,9 +347,6 @@ const ScoreBoard = () => {
     setBatter1({})
   }
   const newBatter2 = () => {
-    const batter2NameElement = document.getElementById('batter2Name')
-    batter2NameElement.value = ''
-    batter2NameElement.disabled = false
     const { id, name, run, ball, four, six, strikeRate, onStrike } = batter2
     setBatters((state) => [
       ...state,
@@ -442,20 +365,6 @@ const ScoreBoard = () => {
     ])
     setBatter2({})
   }
-  const editBatter1Name = () => {
-    if (overCount !== maxOver && wicketCount !== 10 && !hasMatchEnded) {
-      const batter1NameElement = document.getElementById('batter1Name')
-      batter1NameElement.disabled = false
-      setBatter1Edited(true)
-    }
-  }
-  const editBatter2Name = () => {
-    if (overCount !== maxOver && wicketCount !== 10 && !hasMatchEnded) {
-      const batter2NameElement = document.getElementById('batter2Name')
-      batter2NameElement.disabled = false
-      setBatter2Edited(true)
-    }
-  }
   const editBowlerName = () => {
     if (overCount !== maxOver && wicketCount !== 10 && !hasMatchEnded) {
       const bowlerNameElement = document.querySelector('.react-autosuggest__input')
@@ -472,9 +381,6 @@ const ScoreBoard = () => {
     const batter = batters[batters.length - 1]
     const { id, name, run, ball, four, six, strikeRate, onStrike } = batter
     if (batter1.name === undefined || batter1.onStrike) {
-      const batter1NameElement = document.getElementById('batter1Name')
-      batter1NameElement.value = batter.name
-      batter1NameElement.disabled = true
       setBatter1({
         id,
         name,
@@ -495,9 +401,6 @@ const ScoreBoard = () => {
         }))
       }
     } else if (batter2.name === undefined || batter2.onStrike) {
-      const batter2NameElement = document.getElementById('batter2Name')
-      batter2NameElement.value = batter.name
-      batter2NameElement.disabled = true
       setBatter2({
         id,
         name,
@@ -667,14 +570,6 @@ const ScoreBoard = () => {
           }
         }
       }
-    }
-  }
-  const handleStrikeChange = (e) => {
-    changeStrikeRadio(e.target.value)
-    if (e.target.value === 'strike') {
-      switchBatterStrike('batter1')
-    } else {
-      switchBatterStrike('batter2')
     }
   }
   const changeStrikeRadio = (strikeParam) => {
@@ -858,7 +753,6 @@ const ScoreBoard = () => {
     }
   }
   const handleWicket = (isRunOut, playerId) => {
-    setRunOutPlayerId('')
     if (ballCount === 5) {
       if (isNoBall) {
         removeNoBallEffect()
@@ -920,10 +814,6 @@ const ScoreBoard = () => {
         endInningButton.disabled = false
         const bowlerNameElement = document.querySelector('.react-autosuggest__input')
         bowlerNameElement.disabled = true
-        const batter1NameElement = document.getElementById('batter1Name')
-        batter1NameElement.disabled = true
-        const batter2NameElement = document.getElementById('batter2Name')
-        batter2NameElement.disabled = true
         setInputBowler('')
       }
     } else {
@@ -932,53 +822,9 @@ const ScoreBoard = () => {
         endInningButton.disabled = false
         const bowlerNameElement = document.querySelector('.react-autosuggest__input')
         bowlerNameElement.disabled = true
-        const batter1NameElement = document.getElementById('batter1Name')
-        batter1NameElement.disabled = true
-        const batter2NameElement = document.getElementById('batter2Name')
-        batter2NameElement.disabled = true
         setInputBowler('')
       }
     }
-  }
-  const handleCloseModal = () => {
-    if (outType !== '') {
-      if (outType === RUN_OUT) {
-        if (runOutPlayerId !== '') {
-          handleWicket(true, runOutPlayerId)
-        }
-      } else {
-        handleWicket(false, '')
-      }
-    }
-    setModalOpen(false)
-    setOutType('')
-    setRunOutPlayerId('')
-  }
-  const handleCancelModal = () => {
-    // close modal without applying wicket
-    setModalOpen(false)
-    setOutType('')
-    setRunOutPlayerId('')
-    const runOutPlayerErrorElement = document.getElementById('run-out-player-error')
-    if (runOutPlayerErrorElement) runOutPlayerErrorElement.classList.add('hide')
-    const runOutPlayerElement = document.getElementById('run-out-player')
-    if (runOutPlayerElement) runOutPlayerElement.classList.add('hide')
-  }
-  const handleOutTypeChange = (e) => {
-    const outTypeValue = e.target.value
-    setOutType(outTypeValue)
-    if (outTypeValue === RUN_OUT) {
-      const runOutPlayerElement = document.getElementById('run-out-player')
-      runOutPlayerElement.classList.remove('hide')
-      const runOutPlayerErrorElement = document.getElementById('run-out-player-error')
-      runOutPlayerErrorElement.classList.remove('hide')
-    }
-  }
-  const handleRunOutPlayerChange = (e) => {
-    const playerId = e.target.value
-    const runOutPlayerErrorElement = document.getElementById('run-out-player-error')
-    runOutPlayerErrorElement.classList.add('hide')
-    setRunOutPlayerId(playerId)
   }
   const endMatch = () => {
     disableAllScoreButtons()
@@ -999,7 +845,7 @@ const ScoreBoard = () => {
       scoreTypesButtons[i].disabled = false
     }
   }
-  if (batter1.name !== undefined && batter2.name !== undefined && inputBowler !== '') {
+  if (inputBowler !== '') {
     enableAllScoreButtons()
   }
   let rrr = (remainingRuns / (remainingBalls / 6)).toFixed(2)
@@ -1011,9 +857,8 @@ const ScoreBoard = () => {
   const inning2 = match.inning2
   const scoringTeam = batting === team1 ? team1 : team2
   const chessingTeam = scoringTeam === team1 ? team2 : team1
-  let winningMessage = `${inningNo === 1 ? scoringTeam : chessingTeam} needs ${remainingRuns} ${
-    remainingRuns <= 1 ? 'run' : 'runs'
-  } in ${remainingBalls} ${remainingBalls <= 1 ? 'ball' : 'balls'} to win`
+  let winningMessage = `${inningNo === 1 ? scoringTeam : chessingTeam} needs ${remainingRuns} ${remainingRuns <= 1 ? 'run' : 'runs'
+    } in ${remainingBalls} ${remainingBalls <= 1 ? 'ball' : 'balls'} to win`
   if (inningNo === 2) {
     var target = inning1.runs + 1
     if (wicketCount < 10 && overCount <= maxOver && totalRuns >= target) {
@@ -1051,246 +896,128 @@ const ScoreBoard = () => {
     </>
   )
   return (
-    <div className='container'>
-      <div className='inning'>
-        <div>
-          {team1} vs {team2}, {inningNo === 1 ? '1st' : '2nd'} Inning
+    <div className="container mx-auto max-w-xl space-y-4">
+
+  {/* Header */}
+  <div className="flex items-center justify-between gap-3 bg-gradient-to-r from-blue-900 to-blue-700 px-4 py-2 text-white rounded-lg shadow-md">
+    <div className="font-semibold">
+      {team1} vs {team2}, {inningNo === 1 ? '1st' : '2nd'} Inning
+    </div>
+    <div>
+      <button
+        id="end-inning"
+        className="rounded-full bg-yellow-400 px-4 py-2 text-sm font-bold text-black shadow-md transition-all duration-150 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:scale-95 focus:outline-none focus:ring-2 focus:ring-yellow-300"
+        onClick={handleEndInning}
+      >
+        {inningNo === 1 ? 'End Inning' : 'Score Board'}
+      </button>
+    </div>
+  </div>
+
+  {/* Badge */}
+  <div
+    id="badge"
+    className="flex items-center justify-between gap-2 rounded-lg bg-gradient-to-r from-yellow-300 to-yellow-400 px-3 py-2 text-sm font-bold text-gray-900 shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl"
+  >
+    {inningNo === 2
+      ? remainingRunsContent
+      : overCount === maxOver || wicketCount === 10
+      ? firstInningCompletedContent
+      : welcomeContent}
+  </div>
+
+  {/* Main Score Card */}
+  <div className="bg-white p-3 rounded-xl shadow-lg space-y-3">
+
+    {/* Score Header */}
+    <div className="flex items-center justify-between rounded-xl bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 p-4 text-white shadow-lg">
+      <div className="flex flex-col gap-1.5">
+        <div className="text-[0.95rem] font-bold opacity-95">
+          {inningNo === 1 ? scoringTeam : chessingTeam}
         </div>
-        <div>
-          <button id='end-inning' onClick={handleEndInning}>
-            {inningNo === 1 ? 'End Inning' : 'Score Board'}
-          </button>
+        <div className="text-[2.2rem] font-black tracking-wide">
+          <span className="text-white">{totalRuns}</span>/
+          <span className="text-yellow-400 font-bold ml-1">{wicketCount}</span>
+          <span className="text-white">({totalOvers})</span>
         </div>
       </div>
-      <div id='badge' className='badge badge-flex'>
-        {inningNo === 2 ? remainingRunsContent : overCount === maxOver || wicketCount === 10 ? firstInningCompletedContent : welcomeContent}
-      </div>
-      <div className='score-container'>
-        <div>
-          <Modal
-            open={isModalOpen}
-            onClose={handleCloseModal}
-            aria-labelledby='modal-modal-title'
-            aria-describedby='modal-modal-description'
-            className='modal wicket-type-modal'
-          >
-            <Box sx={radioGroupBoxstyle}>
-              <div className='modal-wrapper'>
-                <div className='modal-header'>
-                  <h3>Wicket Type</h3>
-                </div>
-                <FormControl component='fieldset'>
-                  <RadioGroup
-                    row
-                    aria-label='wicket'
-                    name='row-radio-buttons-group'
-                    onChange={handleOutTypeChange}
-                    className='form-radio-row'
-                  >
-                    <FormControlLabel
-                      value={BOLD}
-                      control={
-                        <Radio
-                          sx={{
-                            '&.Mui-checked': {
-                              color: pink[600],
-                            },
-                          }}
-                        />
-                      }
-                      label={BOLD}
-                    />
-                    <FormControlLabel
-                      value={RUN_OUT}
-                      control={
-                        <Radio
-                          sx={{
-                            '&.Mui-checked': {
-                              color: pink[600],
-                            },
-                          }}
-                        />
-                      }
-                      label={RUN_OUT}
-                    />
-                    <select defaultValue='' id='run-out-player' className='run-out-player hide' onChange={handleRunOutPlayerChange}>
-                      <option value='' disabled>
-                        select option
-                      </option>
-                      <option value={batter1.id}>{batter1.name}</option>
-                      <option value={batter2.id}>{batter2.name}</option>
-                    </select>
-                  </RadioGroup>
-                  <div id='run-out-player-error' className='run-out-player-error hide'>
-                    Please select run out player name
-                  </div>
-                </FormControl>
-                <div className='modal-actions'>
-                  <button type='button' className='modal-btn modal-btn-secondary' onClick={handleCancelModal}>
-                    Cancel
-                  </button>
-                  <button type='button' className='modal-btn modal-btn-primary' onClick={handleCloseModal}>
-                    Confirm
-                  </button>
-                </div>
-              </div>
-            </Box>
-          </Modal>
+      <div className="text-right">
+        <div className="text-[0.9rem] opacity-85 text-white">
+          CRR{' '}
+          <span className="block text-[1.4rem] font-extrabold text-white">
+            {isNaN(crr) ? 0 : crr}
+          </span>
         </div>
-        <div className='score'>
-          <div className='score-left'>
-            <div className='team-name'>{inningNo === 1 ? scoringTeam : chessingTeam}</div>
-            <div className='score-main'><span className='runs'>{totalRuns}</span>/<span className='wickets'>{wicketCount}</span> <span className='overs'>({totalOvers})</span></div>
-          </div>
-          <div className='score-right'>
-            <div className='crr'>CRR <span className='crr-value'>{isNaN(crr) ? 0 : crr}</span></div>
-          </div>
-        </div>
-        <div className='batting-container'>
-          <table>
-            <thead>
-              <tr>
-                <td className='score-types padding-left'>Batter</td>
-                <td className='score-types'>R(B)</td>
-              
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className='score-types'>
-                  <span id='strike'>
-                    <Radio
-                      size='small'
-                      checked={strikeValue === 'strike'}
-                      onChange={handleStrikeChange}
-                      value='strike'
-                      name='radio-buttons'
-                      inputProps={{ 'aria-label': 'strike' }}
-                      style={{ padding: '0 4px 0 2px' }}
-                    />
-                  </span>
-                  <input type='text' id='batter1Name' className='batter-name' onBlur={handleBatter1Blur} />
-                  <IconButton color='primary' className='icon-button' onClick={editBatter1Name}>
-                    <EditIcon className='icon-size' />
-                  </IconButton>
-                </td>
-                <td className='score-types'>{batter1.run === undefined ? `0(0)` : `${batter1.run}(${batter1.ball})`}</td>
-                
-              </tr>
-              <tr>
-                <td className='score-types'>
-                  <span id='non-strike'>
-                    <Radio
-                      size='small'
-                      checked={strikeValue === 'non-strike'}
-                      onChange={handleStrikeChange}
-                      value='non-strike'
-                      name='radio-buttons'
-                      inputProps={{ 'aria-label': 'non-strike' }}
-                      style={{ padding: '0 4px 0 2px' }}
-                    />
-                  </span>
-                  <input type='text' id='batter2Name' className='batter-name' onBlur={handleBatter2Blur} />
-                  <IconButton color='primary' className='icon-button' onClick={editBatter2Name}>
-                    <EditIcon className='icon-size' />
-                  </IconButton>
-                </td>
-                <td className='score-types'>{batter2.run === undefined ? `0(0)` : `${batter2.run}(${batter2.ball})`}</td>
-              
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div className='bowler-container'>
-          <div className='bowler'>
-            Bowler:
-            <Autosuggest
-              suggestions={suggestions}
-              onSuggestionsFetchRequested={onSuggestionsFetchRequested}
-              onSuggestionsClearRequested={() => {
-                setSuggestions([])
-              }}
-              getSuggestionValue={getSuggestionValue}
-              renderSuggestion={(suggestion) => <div>{suggestion.name}</div>}
-              inputProps={inputProps}
-            />
-            <IconButton color='primary' className='icon-button' onClick={editBowlerName}>
-              <EditIcon className='icon-size' />
-            </IconButton>
-          </div>
-          <div className='bowler-runs'>
-            {currentRunStack.map((run, i) => (
-              <div key={i}>{run}</div>
-            ))}
-            <IconButton color='warning' className='icon-button' onClick={undoDelivery}>
-              <DeleteIcon className='delete-icon-size' />
-            </IconButton>
-          </div>
-        </div>
-        <div className='score-types-container'>
-          <table>
-            <tbody>
-              <tr>
-                <td className='score-types' onClick={() => handleRun(0)}>
-                  <button className='score-types-button' disabled>
-                    0
-                  </button>
-                </td>
-                <td className='score-types' onClick={() => handleRun(1)}>
-                  <button className='score-types-button' disabled>
-                    1
-                  </button>
-                </td>
-                <td className='score-types' onClick={() => handleRun(2)}>
-                  <button className='score-types-button' disabled>
-                    2
-                  </button>
-                </td>
-                <td className='score-types' onClick={handleNoBall}>
-                  <button className='score-types-button' disabled>
-                    nb
-                  </button>
-                </td>
-                <td rowSpan='2' className='score-types' onClick={() => setModalOpen(true)}>
-                  <button className='score-types-button' disabled>
-                    W
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td className='score-types' onClick={() => handleRun(3)}>
-                  <button className='score-types-button' disabled>
-                    3
-                  </button>
-                </td>
-                <td className='score-types' onClick={() => handleRun(4)}>
-                  <button className='score-types-button' disabled>
-                    4
-                  </button>
-                </td>
-                <td className='score-types' onClick={() => handleRun(6)}>
-                  <button className='score-types-button' disabled>
-                    6
-                  </button>
-                </td>
-                <td className='score-types' onClick={handleWide}>
-                  <button className='score-types-button' disabled>
-                    wd
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div className='extras-container'>
-          <div>Extras: {extras.total}</div>
-          <div>Wd: {extras.wide}</div>
-          <div>NB: {extras.noBall}</div>
-        </div>
-        
-        
       </div>
     </div>
+
+    {/* Bowler Selection */}
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 bg-indigo-100/40 p-2 rounded-lg shadow-inner">
+        <span className="font-semibold">Bowler:</span>
+        <Autosuggest
+          suggestions={suggestions}
+          onSuggestionsFetchRequested={onSuggestionsFetchRequested}
+          onSuggestionsClearRequested={() => setSuggestions([])}
+          getSuggestionValue={getSuggestionValue}
+          renderSuggestion={(suggestion) => <div>{suggestion.name}</div>}
+          inputProps={inputProps}
+        />
+        <FontAwesomeIcon
+          icon={faPencil}
+          className="text-gray-700 text-xl px-1 cursor-pointer hover:text-gray-900"
+          onClick={editBowlerName}
+        />
+      </div>
+
+      {/* Current Run Stack */}
+      <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50 shadow-sm">
+        {currentRunStack.map((run, i) => (
+          <div key={i} className="text-center font-semibold text-gray-800 px-1">
+            {run}
+          </div>
+        ))}
+        <FontAwesomeIcon
+          icon={faTrash}
+          className="text-yellow-400 text-xl cursor-pointer hover:text-yellow-500"
+          onClick={undoDelivery}
+        />
+      </div>
+    </div>
+
+    {/* Score Buttons */}
+    <div className="grid max-w-[360px] grid-cols-3 gap-3 mt-2">
+      {[
+        { label: 'Dot', onClick: () => handleRun(0) },
+        { label: 'Wide', onClick: handleWide },
+        { label: 'No Ball', onClick: handleNoBall },
+        { label: '1', onClick: () => handleRun(1) },
+        { label: '2', onClick: () => handleRun(2) },
+        { label: '3', onClick: () => handleRun(3) },
+        { label: '4', onClick: () => handleRun(4) },
+        { label: '6', onClick: () => handleRun(6) },
+        { label: 'W', onClick: () => handleWicket(false, '') },
+      ].map((btn, i) => (
+        <div
+          key={i}
+          onClick={btn.onClick}
+          className="flex items-center justify-center h-12 rounded-lg bg-blue-100 hover:bg-blue-200 text-center font-bold cursor-pointer shadow-sm transition-all duration-150 active:scale-95"
+        >
+          {btn.label}
+        </div>
+      ))}
+    </div>
+
+    {/* Extras */}
+    <div className="flex justify-between items-center gap-2 p-2 mt-2 bg-gray-100 rounded-lg text-sm font-semibold text-gray-800 shadow-inner">
+      <div>Extras: {extras.total}</div>
+      <div>Wd: {extras.wide}</div>
+      <div>NB: {extras.noBall}</div>
+    </div>
+
+  </div>
+</div>
+
   )
 }
 
