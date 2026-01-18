@@ -1,15 +1,9 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Roboto', 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
-    'Helvetica Neue', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-.MuiAppBar-colorPrimary,
-.MuiButton-containedPrimary{
-  background: linear-gradient(180deg,#0d47a1,#1565c0);
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+@layer components {
+  .cell-ui {
+    @apply h-16 bg-[#f4f6ff] border border-[#3f51b5] rounded-lg flex items-center justify-center text-[18px] cursor-pointer select-none transition-all duration-200 ease-in-out hover:-translate-y-[3px] hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] active:bg-[#3f51b5] active:text-white;
+  }
 }
