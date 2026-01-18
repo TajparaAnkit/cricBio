@@ -1,3 +1,5 @@
 export const BATTING = 'Batting'
 export const YET_TO_BAT = 'Yet to Bat'
 export const OUT = 'Out'
+export const BOLD = 'Bold'
+export const RUN_OUT = 'Run Out'
