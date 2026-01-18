@@ -25,14 +25,10 @@ const ScoreBoard = () => {
   const [batter1, setBatter1] = useState({})
   const [batter2, setBatter2] = useState({})
   const [battingOrder, setBattingOrder] = useState(0)
-  const [isBatter1Edited, setBatter1Edited] = useState(false)
-  const [isBatter2Edited, setBatter2Edited] = useState(false)
   const [isBowlerEdited, setBowlerEdited] = useState(false)
   const [bowler, setBowler] = useState({})
   const [bowlers, setBowlers] = useState([])
   const [inputBowler, setInputBowler] = useState('')
-  const [outType, setOutType] = React.useState('')
-  const [runOutPlayerId, setRunOutPlayerId] = React.useState('')
   const [remainingBalls, setRemainingBalls] = useState(0)
   const [remainingRuns, setRemainingRuns] = useState(0)
   const [strikeValue, setStrikeValue] = React.useState('strike')
@@ -159,7 +155,6 @@ const ScoreBoard = () => {
             inning1: {
               runs: totalRuns,
               wickets: wicketCount,
-              runRate: crr,
               overs: totalOvers,
               four: totalFours,
               six: totalSixes,
@@ -200,7 +195,6 @@ const ScoreBoard = () => {
             inning2: {
               runs: totalRuns,
               wickets: wicketCount,
-              runRate: crr,
               overs: totalOvers,
               four: totalFours,
               six: totalSixes,
@@ -394,7 +388,6 @@ const ScoreBoard = () => {
         battingStatus: BATTING,
       })
       if (!batter.onStrike) {
-        changeStrikeRadio()
         setBatter2((state) => ({
           ...state,
           onStrike: true,
@@ -414,7 +407,6 @@ const ScoreBoard = () => {
         battingStatus: BATTING,
       })
       if (!batter.onStrike) {
-        changeStrikeRadio()
         setBatter1((state) => ({
           ...state,
           onStrike: true,
@@ -461,8 +453,6 @@ const ScoreBoard = () => {
           }
         })
       } else {
-        changeStrikeRadio()
-        switchBatterStrike()
         setBatter2((state) => {
           const updatedRun = state.run - run
           const updatedBall = state.ball - 1
@@ -511,8 +501,6 @@ const ScoreBoard = () => {
           }
         })
       } else {
-        changeStrikeRadio()
-        switchBatterStrike()
         setBatter1((state) => {
           const updatedRun = state.run - run
           const updatedBall = state.ball - 1
@@ -572,45 +560,8 @@ const ScoreBoard = () => {
       }
     }
   }
-  const changeStrikeRadio = (strikeParam) => {
-    if (strikeParam === undefined) {
-      setStrikeValue(strikeValue === 'strike' ? 'non-strike' : 'strike')
-    } else {
-      setStrikeValue(strikeParam)
-    }
-  }
-  const switchBatterStrike = (strikeParam) => {
-    if (strikeParam === undefined) {
-      setBatter1((state) => ({
-        ...state,
-        onStrike: !state.onStrike,
-      }))
-      setBatter2((state) => ({
-        ...state,
-        onStrike: !state.onStrike,
-      }))
-    } else {
-      if (strikeParam === 'batter1') {
-        setBatter1((state) => ({
-          ...state,
-          onStrike: true,
-        }))
-        setBatter2((state) => ({
-          ...state,
-          onStrike: false,
-        }))
-      } else if (strikeParam === 'batter2') {
-        setBatter1((state) => ({
-          ...state,
-          onStrike: false,
-        }))
-        setBatter2((state) => ({
-          ...state,
-          onStrike: true,
-        }))
-      }
-    }
-  }
+
+
   const handleRun = (run) => {
     if (isNoBall) {
       setCurrentRunStack((state) => [...state, 'nb' + run])
@@ -630,7 +581,6 @@ const ScoreBoard = () => {
     if (ballCount === 5) {
       if (isNoBall) {
         if (run % 2 !== 0) {
-          changeStrikeRadio()
         }
       } else {
         setTotalOvers(overCount + 1)
@@ -638,7 +588,6 @@ const ScoreBoard = () => {
         arr.push(run)
         overCompleted(runsByOver + run, arr)
         if (run % 2 === 0) {
-          changeStrikeRadio()
         }
       }
     } else {
@@ -646,7 +595,6 @@ const ScoreBoard = () => {
         setTotalOvers(Math.round((totalOvers + 0.1) * 10) / 10)
       }
       if (run % 2 !== 0) {
-        changeStrikeRadio()
       }
     }
     if (batter1.onStrike) {
@@ -673,11 +621,9 @@ const ScoreBoard = () => {
       })
       if (isNoBall) {
         if (run % 2 !== 0) {
-          switchBatterStrike()
         }
       } else {
         if ((ballCount === 5 && run % 2 === 0) || (ballCount !== 5 && run % 2 !== 0)) {
-          switchBatterStrike()
         }
       }
     } else {
@@ -703,7 +649,6 @@ const ScoreBoard = () => {
         }
       })
       if ((ballCount === 5 && run % 2 === 0) || (ballCount !== 5 && run % 2 !== 0)) {
-        switchBatterStrike()
       }
     }
   }
@@ -792,12 +737,8 @@ const ScoreBoard = () => {
     if (isRunOut) {
       if (batter1.id === playerId) {
         newBatter1()
-        changeStrikeRadio('strike')
-        switchBatterStrike('batter1')
       } else {
         newBatter2()
-        changeStrikeRadio('non-strike')
-        switchBatterStrike('batter2')
       }
     } else {
       if (!isNoBall) {
@@ -848,11 +789,7 @@ const ScoreBoard = () => {
   if (inputBowler !== '') {
     enableAllScoreButtons()
   }
-  let rrr = (remainingRuns / (remainingBalls / 6)).toFixed(2)
-  rrr = isFinite(rrr) ? rrr : 0
   const overs = overCount + ballCount / 6
-  let crr = (totalRuns / overs).toFixed(2)
-  crr = isFinite(crr) ? crr : 0
   const inning1 = match.inning1
   const inning2 = match.inning2
   const scoringTeam = batting === team1 ? team1 : team2
@@ -892,131 +829,129 @@ const ScoreBoard = () => {
     <>
       <div>Target: {target}</div>
       <div>{winningMessage}</div>
-      <div>RRR: {isNaN(rrr) ? 0 : rrr}</div>
     </>
   )
   return (
     <div className="container mx-auto max-w-xl space-y-4">
 
-  {/* Header */}
-  <div className="flex items-center justify-between gap-3 bg-gradient-to-r from-blue-900 to-blue-700 px-4 py-2 text-white rounded-lg shadow-md">
-    <div className="font-semibold">
-      {team1} vs {team2}, {inningNo === 1 ? '1st' : '2nd'} Inning
-    </div>
-    <div>
-      <button
-        id="end-inning"
-        className="rounded-full bg-yellow-400 px-4 py-2 text-sm font-bold text-black shadow-md transition-all duration-150 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:scale-95 focus:outline-none focus:ring-2 focus:ring-yellow-300"
-        onClick={handleEndInning}
+      {/* Header */}
+      <div className="flex items-center justify-between gap-3 bg-gradient-to-r from-blue-900 to-blue-700 px-4 py-2 text-white rounded-lg shadow-md">
+        <div className="font-semibold">
+          {team1} vs {team2}, {inningNo === 1 ? '1st' : '2nd'} Inning
+        </div>
+        <div>
+          <button
+            id="end-inning"
+            className="rounded-full bg-yellow-400 px-4 py-2 text-sm font-bold text-black shadow-md transition-all duration-150 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:scale-95 focus:outline-none focus:ring-2 focus:ring-yellow-300"
+            onClick={handleEndInning}
+          >
+            {inningNo === 1 ? 'End Inning' : 'Score Board'}
+          </button>
+        </div>
+      </div>
+
+      {/* Badge */}
+      <div
+        id="badge"
+        className="flex items-center justify-between gap-2 rounded-lg bg-gradient-to-r from-yellow-300 to-yellow-400 px-3 py-2 text-sm font-bold text-gray-900 shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl"
       >
-        {inningNo === 1 ? 'End Inning' : 'Score Board'}
-      </button>
-    </div>
-  </div>
-
-  {/* Badge */}
-  <div
-    id="badge"
-    className="flex items-center justify-between gap-2 rounded-lg bg-gradient-to-r from-yellow-300 to-yellow-400 px-3 py-2 text-sm font-bold text-gray-900 shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl"
-  >
-    {inningNo === 2
-      ? remainingRunsContent
-      : overCount === maxOver || wicketCount === 10
-      ? firstInningCompletedContent
-      : welcomeContent}
-  </div>
-
-  {/* Main Score Card */}
-  <div className="bg-white p-3 rounded-xl shadow-lg space-y-3">
-
-    {/* Score Header */}
-    <div className="flex items-center justify-between rounded-xl bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 p-4 text-white shadow-lg">
-      <div className="flex flex-col gap-1.5">
-        <div className="text-[0.95rem] font-bold opacity-95">
-          {inningNo === 1 ? scoringTeam : chessingTeam}
-        </div>
-        <div className="text-[2.2rem] font-black tracking-wide">
-          <span className="text-white">{totalRuns}</span>/
-          <span className="text-yellow-400 font-bold ml-1">{wicketCount}</span>
-          <span className="text-white">({totalOvers})</span>
-        </div>
-      </div>
-      <div className="text-right">
-        <div className="text-[0.9rem] opacity-85 text-white">
-          CRR{' '}
-          <span className="block text-[1.4rem] font-extrabold text-white">
-            {isNaN(crr) ? 0 : crr}
-          </span>
-        </div>
-      </div>
-    </div>
-
-    {/* Bowler Selection */}
-    <div className="space-y-2">
-      <div className="flex items-center gap-2 bg-indigo-100/40 p-2 rounded-lg shadow-inner">
-        <span className="font-semibold">Bowler:</span>
-        <Autosuggest
-          suggestions={suggestions}
-          onSuggestionsFetchRequested={onSuggestionsFetchRequested}
-          onSuggestionsClearRequested={() => setSuggestions([])}
-          getSuggestionValue={getSuggestionValue}
-          renderSuggestion={(suggestion) => <div>{suggestion.name}</div>}
-          inputProps={inputProps}
-        />
-        <FontAwesomeIcon
-          icon={faPencil}
-          className="text-gray-700 text-xl px-1 cursor-pointer hover:text-gray-900"
-          onClick={editBowlerName}
-        />
+        {inningNo === 2
+          ? remainingRunsContent
+          : overCount === maxOver || wicketCount === 10
+            ? firstInningCompletedContent
+            : welcomeContent}
       </div>
 
-      {/* Current Run Stack */}
-      <div className="flex items-center justify-between p-2 rounded-lg bg-gray-50 shadow-sm">
-        {currentRunStack.map((run, i) => (
-          <div key={i} className="text-center font-semibold text-gray-800 px-1">
-            {run}
+      {/* Main Score Card */}
+      <div className="bg-white p-3 rounded-xl shadow-lg space-y-3">
+
+        {/* Score Header */}
+        <div className="flex items-center justify-between rounded-xl bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 p-4 text-white shadow-lg">
+          <div className="flex flex-col gap-1.5">
+            <div className="text-[0.95rem] font-bold opacity-95">
+              {inningNo === 1 ? scoringTeam : chessingTeam}
+            </div>
+            <div className="text-[4.2rem] tracking-wide">
+              <span className="text-white">{totalRuns}</span>/
+              <span className="text-yellow-400 ml-1">{wicketCount}</span>
+            </div>
           </div>
-        ))}
-        <FontAwesomeIcon
-          icon={faTrash}
-          className="text-yellow-400 text-xl cursor-pointer hover:text-yellow-500"
-          onClick={undoDelivery}
-        />
+          <div className="text-right">
+            <div className="text-[1rem] opacity-85 text-white">
+              over
+              <span className="block text-[1.5rem] text-white">
+                ({totalOvers})
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Bowler Selection */}
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 bg-indigo-100/40 p-2 rounded-lg shadow-inner justify-between">
+            <span className="font-semibold">Bowler:</span>
+            <Autosuggest
+              suggestions={suggestions}
+              onSuggestionsFetchRequested={onSuggestionsFetchRequested}
+              onSuggestionsClearRequested={() => setSuggestions([])}
+              getSuggestionValue={getSuggestionValue}
+              renderSuggestion={(suggestion) => <div>{suggestion.name}</div>}
+              inputProps={inputProps}
+            />
+            <FontAwesomeIcon
+              icon={faPencil}
+              className="text-gray-700 text-xl px-1 cursor-pointer hover:text-gray-900"
+              onClick={editBowlerName}
+            />
+          </div>
+
+          {/* Current Run Stack */}
+          <div className="grid grid-cols-3 gap-4 p-2 rounded-lg bg-gray-50 shadow-sm">
+            {currentRunStack.map((run, i) => (
+              <span key={i} className="text-center font-semibold text-gray-800 px-1 bg-blue-100">
+                {run}
+              </span>
+            ))}
+            <FontAwesomeIcon
+              icon={faTrash}
+              className="text-yellow-400 text-xl cursor-pointer hover:text-yellow-500"
+              onClick={undoDelivery}
+            />
+          </div>
+        </div>
+
+        {/* Score Buttons */}
+        <div className="grid max-w-[360px] grid-cols-3 gap-3 mt-2">
+          {[
+            { label: 'Dot', onClick: () => handleRun(0) },
+            { label: 'Wide', onClick: handleWide },
+            { label: 'No Ball', onClick: handleNoBall },
+            { label: '1', onClick: () => handleRun(1) },
+            { label: '2', onClick: () => handleRun(2) },
+            { label: '3', onClick: () => handleRun(3) },
+            { label: '4', onClick: () => handleRun(4) },
+            { label: '6', onClick: () => handleRun(6) },
+            { label: 'W', onClick: () => handleWicket(false, '') },
+          ].map((btn, i) => (
+            <div
+              key={i}
+              onClick={btn.onClick}
+              className="flex items-center justify-center h-12 rounded-lg bg-blue-100 hover:bg-blue-200 text-center font-bold cursor-pointer shadow-sm transition-all duration-150 active:scale-95"
+            >
+              {btn.label}
+            </div>
+          ))}
+        </div>
+
+        {/* Extras */}
+        <div className="flex justify-between items-center gap-2 p-2 mt-2 bg-gray-100 rounded-lg text-sm font-semibold text-gray-800 shadow-inner">
+          <div>Extras: {extras.total}</div>
+          <div>Wd: {extras.wide}</div>
+          <div>NB: {extras.noBall}</div>
+        </div>
+
       </div>
     </div>
-
-    {/* Score Buttons */}
-    <div className="grid max-w-[360px] grid-cols-3 gap-3 mt-2">
-      {[
-        { label: 'Dot', onClick: () => handleRun(0) },
-        { label: 'Wide', onClick: handleWide },
-        { label: 'No Ball', onClick: handleNoBall },
-        { label: '1', onClick: () => handleRun(1) },
-        { label: '2', onClick: () => handleRun(2) },
-        { label: '3', onClick: () => handleRun(3) },
-        { label: '4', onClick: () => handleRun(4) },
-        { label: '6', onClick: () => handleRun(6) },
-        { label: 'W', onClick: () => handleWicket(false, '') },
-      ].map((btn, i) => (
-        <div
-          key={i}
-          onClick={btn.onClick}
-          className="flex items-center justify-center h-12 rounded-lg bg-blue-100 hover:bg-blue-200 text-center font-bold cursor-pointer shadow-sm transition-all duration-150 active:scale-95"
-        >
-          {btn.label}
-        </div>
-      ))}
-    </div>
-
-    {/* Extras */}
-    <div className="flex justify-between items-center gap-2 p-2 mt-2 bg-gray-100 rounded-lg text-sm font-semibold text-gray-800 shadow-inner">
-      <div>Extras: {extras.total}</div>
-      <div>Wd: {extras.wide}</div>
-      <div>NB: {extras.noBall}</div>
-    </div>
-
-  </div>
-</div>
 
   )
 }
